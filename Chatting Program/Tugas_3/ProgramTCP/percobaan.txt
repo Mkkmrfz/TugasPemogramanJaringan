@@ -1,3 +1,5 @@
-bebashsjags
-hxhsgsjshhdgshsg
-gshshsu
+ini adalah Program untuk melengkapi tugas Matakuliah Pemograman Jaringan
+
+Tugas Ini merupakan Tugas Kelompok yang beranggotakan : 1, Muhammad Rofi Hidayat (362201007) 2. Sukma Setia Hadinata (362201011) 3. Muhammad Fikri Alghifari (362201012)
+
+pada Tugas yang pertama ditugaskan untuk membuat sebuah aplikasi chatting sederhana menggunakan metode server socket. pada tugas yang kedua merupakan program sederhana yang menggunakan sebuah metode blocking dan non blocking server. Pada TUgas yang Ketiga diTugaskan untuk Membuat sebuah program dengan metode TCP dan UDP. Dimana dengan metode TCP membuat client bisa mengirimkan sebuah FIle ke server.

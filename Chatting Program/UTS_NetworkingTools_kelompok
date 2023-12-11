@@ -1,0 +1,23 @@
+import java.io.IOException;
+import java.net.InetAddress;
+
+public class NetworkTools {
+
+    public static void main(String[] args) {
+        String website = "www.youtube.com"; // Ganti dengan alamat situs yang ingin diperiksa
+
+        System.out.println("Mengecek koneksi ke: " + website);
+
+        try {
+            InetAddress inetAddress = InetAddress.getByName(website);
+
+            if (inetAddress.isReachable(5000)) { // Timeout set to 5 seconds (5000 milliseconds)
+                System.out.println("Koneksi berhasil!");
+            } else {
+                System.out.println("Tidak dapat terhubung ke situs.");
+            }
+        } catch (IOException e) {
+            System.out.println("Terjadi kesalahan: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,80 @@
+import socket
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+import hashlib
+
+# Fungsi untuk padding data agar memiliki panjang yang sesuai untuk enkripsi AES
+def pad(data):
+    length = 16 - (len(data) % 16)
+    return data + bytes([length] * length)
+
+# Fungsi untuk menghapus padding dari data setelah dekripsi
+def unpad(data):
+    return data[:-data[-1]]
+
+# Fungsi untuk menghasilkan kunci enkripsi dari kata sandi
+def generate_key(password):
+    key = hashlib.sha256(password.encode()).digest()
+    return key
+
+# Fungsi untuk enkripsi data menggunakan AES
+def encrypt(data, key):
+    cipher = AES.new(key, AES.MODE_CBC)
+    ct_bytes = cipher.encrypt(pad(data))
+    iv = cipher.iv
+    return iv + ct_bytes
+
+# Fungsi untuk dekripsi data yang dienkripsi menggunakan AES
+def decrypt(data, key):
+    iv = data[:AES.block_size]
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    pt = unpad(cipher.decrypt(data[AES.block_size:]))
+    return pt
+
+# Fungsi untuk menerima koneksi dari klien
+def handle_client(conn, key):
+    with conn:
+        print('Connected by', conn)
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
+            decrypted_data = decrypt(data, key)
+            print('Received:', decrypted_data.decode())
+            conn.sendall(b'Received: ' + decrypted_data)
+
+# Fungsi utama untuk menjalankan server
+def run_server(host, port, password):
+    key = generate_key(password)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((host, port))
+        s.listen()
+        print('Server listening on', (host, port))
+        conn, addr = s.accept()
+        with conn:
+            handle_client(conn, key)
+
+# Fungsi untuk mengirim data ke server
+def send_data(host, port, data, password):
+    key = generate_key(password)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, port))
+        encrypted_data = encrypt(data.encode(), key)
+        s.sendall(encrypted_data)
+        print('Sent:', data)
+        received_data = s.recv(1024)
+        decrypted_data = decrypt(received_data, key)
+        print('Received:', decrypted_data.decode())
+
+if __name__ == "__main__":
+    HOST = 'localhost'  # Ganti dengan alamat IP server jika perlu
+    PORT = 12345        # Port yang digunakan oleh server
+    PASSWORD = "mysecurepassword"  # Kata sandi untuk menghasilkan kunci enkripsi
+
+    # Jalankan server di thread terpisah
+    import threading
+    server_thread = threading.Thread(target=run_server, args=(HOST, PORT, PASSWORD))
+    server_thread.start()
+
+    # Kirim data ke server
+    send_data(HOST, PORT, "Hello, server!", PASSWORD)
